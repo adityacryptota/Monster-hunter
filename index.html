@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Monster Slayer</title>
+    <script src="https://npmcdn.com/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="css/foundation.min.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+
+<body>
+    <div id="app">
+        <section class="row">
+            <div class="small-6 columns">
+                <h1 class="text-center">YOU</h1>
+                <div class="healthbar">
+                    <div class="healthbar text-center" style="background-color: green; margin: 0; color: white;" :style="{width: humanHealth + '%'}">
+                        <p>{{humanHealth}}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="small-6 columns">
+                <h1 class="text-center">MONSTER</h1>
+                <div class="healthbar">
+                    <div class="healthbar text-center" style="background-color: green; margin: 0; color: white;" :style="{width: monsterHealth + '%'}">
+                        <p>{{monsterHealth}}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Start new game -->
+
+        <section v-if="!hide && win" class="row controls">
+            <div class="small-12 columns">
+                <button @click="hide = !hide" id="start-game">START NEW GAME</button>
+            </div>
+        </section>
+
+        <!-- Attacks -->
+
+        <section v-if="hide && win" class="row controls">
+            <div class="small-12 columns">
+                <button @click="attack()" id="attack">ATTACK</button>
+                <button @click="specialAttack()" id="special-attack">SPECIAL
+                    ATTACK</button>
+                <button @click="humanHealth += 5" id="heal">HEAL</button>
+                <button @click="giveUp()" id="give-up">GIVE
+                    UP</button>
+            </div>
+        </section>
+        <section v-if="!win" class="row controls">
+            <h1>You {{result}} this monster.</h1>
+            <button @click="restart()">Restart</button>
+        </section>
+        <section v-if="hide && win" class="row log">
+            <div class="small-12 columns">
+                <ul>
+                    <li v-for="score in scores">
+                        {{score.text}}
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        new Vue({
+            el: "#app",
+            data: {
+                hide: false,
+                humanHealth: 100,
+                monsterHealth: 100,
+                win: true,
+                result: "",
+                scores: []
+            },
+            watch: {
+                humanHealth: function () {
+                    if (this.humanHealth < 5) {
+                        alert("You are a loser");
+                        this.win = false;
+                        this.result = "failed";
+                        this.scores = [];
+                    }
+                    if(this.humanHealth > 100){
+                        this.humanHealth = 100;
+                    }
+                },
+                monsterHealth: function () {
+                    if (this.monsterHealth < 5) {
+                        alert("You are a winner");
+                        this.win = false;
+                        this.result = "defeated";
+                        this.scores = [];
+                    }
+                    if (this.monsterHealth > 100) {
+                        this.monsterHealth = 100;
+                    }
+                }
+            },
+            methods: {
+                attack: function () {
+                    this.humanHealth -= 6;
+                    this.monsterHealth -= 5;
+                    this.scores.unshift({
+                        text: 'Player hits the monster for 6'
+                    });
+                    this.scores.unshift({
+                        text: 'Monster hits the player for 5'
+                    });
+                },
+                specialAttack: function () {
+                    this.humanHealth -= 7;
+                    this.monsterHealth -= 10;
+                    this.scores.unshift({
+                        text: 'Player hits the monster for 7'
+                    });
+                    this.scores.unshift({
+                        text: 'Monster hits the player for 10'
+                    })
+                },
+                giveUp: function () {
+                    this.humanHealth = 100;
+                    this.monsterHealth = 100;
+                    this.hide = !this.hide;
+                    this.scores = [];
+                },
+                restart: function(){
+                    this.hide = !this.hide;
+                    this.win = !this.win; 
+                    this.humanHealth = 100; 
+                    this.monsterHealth = 100
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
